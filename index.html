@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year 2026! ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fff0f6; /* Soft Blush Pink */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Fredoka', sans-serif;
+            overflow: hidden;
+            cursor: crosshair; /* Clean, simple cursor */
+        }
+
+        /* Floating Background Decorations */
+        .bg-dots {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#ffc8dd 2px, transparent 2px);
+            background-size: 30px 30px;
+            z-index: -1;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 50px;
+            border: 8px solid #ffafcc;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(255, 175, 204, 0.3);
+            z-index: 10;
+            max-width: 380px;
+            position: relative;
+        }
+
+        .gif-frame {
+            border-radius: 30px;
+            overflow: hidden;
+            border: 4px solid #ffc8dd;
+            margin-bottom: 20px;
+        }
+
+        .gif-frame img { width: 100%; display: block; }
+
+        h1 {
+            color: #ff006e;
+            font-size: 2.5rem;
+            margin: 0;
+            filter: drop-shadow(2px 2px 0px #ffc8dd);
+        }
+
+        .btn-sparkle {
+            background: #ff006e;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 0 #b90050;
+        }
+
+        .btn-sparkle:hover {
+            transform: scale(1.1);
+            background: #ff4797;
+        }
+
+        .btn-sparkle:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #b90050;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-dots"></div>
+    <canvas id="canvas"></canvas>
+
+    <div class="card">
+        <div class="gif-frame">
+            <img src="https://media1.tenor.com/m/fXHESIvaXBgAAAAd/my-dress-up-darling-fireworks.gif" alt="Celebration">
+        </div>
+        <h1>Happy 26!</h1>
+        <h1>Thank you for being a mitra 💐🙏🏻</h1>
+        <p style="color: #fb6f92;">Click anywhere for magic! ✨</p>
+        <button class="btn-sparkle" onclick="spawnBurst(window.innerWidth/2, window.innerHeight/2)">Celebrate! 🎀</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        const characters = ['ฅ^•ﻌ•^ฅ', '(*¯︶¯*)', '(◕‿◕✿)', '✨', '💖', '⭐', '🧁'];
+
+        class Particle {
+            constructor(x, y, isChar = false) {
+                this.x = x;
+                this.y = y;
+                this.isChar = isChar;
+                this.char = characters[Math.floor(Math.random() * characters.length)];
+                this.size = Math.random() * 20 + 10;
+                this.speedX = Math.random() * 10 - 5;
+                this.speedY = Math.random() * -15 - 5;
+                this.gravity = 0.4;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+                this.color = `hsl(${Math.random() * 40 + 330}, 100%, 75%)`;
+                this.opacity = 1;
+            }
+
+            update() {
+                this.speedY += this.gravity;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= 0.015;
+                this.rotation += this.rotationSpeed;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                
+                if (this.isChar) {
+                    ctx.font = `${this.size}px Arial`;
+                    ctx.fillText(this.char, 0, 0);
+                } else {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size/2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        function spawnBurst(x, y) {
+            for (let i = 0; i < 15; i++) {
+                particles.push(new Particle(x, y, Math.random() > 0.3));
+            }
+        }
+
+        // Mouse Trail effect
+        window.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.8) {
+                particles.push(new Particle(e.clientX, e.clientY, false));
+            }
+        });
+
+        // Click effect
+        window.addEventListener('mousedown', (e) => {
+            spawnBurst(e.clientX, e.clientY);
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+                if (p.opacity <= 0) particles.splice(i, 1);
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+    </script>
+</body>
+</html>
